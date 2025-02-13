@@ -16,24 +16,24 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'Simple Math',
+      label: 'which is bigger 9.11 and 9.9?',
+      action: 'which is bigger 9.11 and 9.9?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'Counting',
+      label: `How many 'r's are in the word strawberry?`,
+      action: `How many 'r's are in the word strawberry?`,
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Writing with constrains',
+      label: `Write a short story of exactly 100 characters long and using only the first 100 Chinese characters.`,
+      action: `Write a short story of exactly 100 characters long and using only the first 100 Chinese characters.`,
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'Math with strong reasoning',
+      label: 'Three different pairs of shoes are placed in a row so that no left shoe is next to a right shoe from a different pair. In how many ways can these six shoes be lined up?',
+      action: 'Three different pairs of shoes are placed in a row so that no left shoe is next to a right shoe from a different pair. In how many ways can these six shoes be lined up?',
     },
   ];
 
