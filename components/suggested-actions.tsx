@@ -17,7 +17,7 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
       title: 'Simple Math',
-      label: 'which is bigger 9.11 and 9.9?',
+      label: 'Which number is bigger 9.11 and 9.9?',
       action: 'which is bigger 9.11 and 9.9?',
     },
     {
@@ -58,12 +58,14 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
                 content: suggestedAction.action,
               });
             }}
-            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+            className="text-left border rounded-xl px-4 py-3.5 text-sm w-full h-auto justify-start items-start whitespace-normal"
           >
-            <span className="font-medium">{suggestedAction.title}</span>
-            <span className="text-muted-foreground">
-              {suggestedAction.label}
-            </span>
+            <div className="flex flex-col gap-1 w-full">
+              <span className="font-medium">{suggestedAction.title}</span>
+              <span className="text-muted-foreground break-words">
+                {suggestedAction.label}
+              </span>
+            </div>
           </Button>
         </motion.div>
       ))}
