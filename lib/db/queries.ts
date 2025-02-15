@@ -4,6 +4,7 @@ import { genSaltSync, hashSync } from 'bcrypt-ts';
 import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { sql } from 'drizzle-orm';
 
 import {
   user,
@@ -113,15 +114,15 @@ export async function saveMessages({ messages }: { messages: Array<Message> }) {
   }
 }
 
-export async function getMessagesByChatId({ id }: { id: string }) {
+export async function getMessagesByChatId(chatId: string) {
   try {
     return await db
       .select()
       .from(message)
-      .where(eq(message.chatId, id))
+      .where(eq(message.chatId, chatId))
       .orderBy(asc(message.createdAt));
   } catch (error) {
-    console.error('Failed to get messages by chat id from database', error);
+    console.error('Failed to retrieve messages for chat:', error);
     throw error;
   }
 }
@@ -342,6 +343,39 @@ export async function updateChatVisiblityById({
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
     console.error('Failed to update chat visibility in database');
+    throw error;
+  }
+}
+
+export async function getUsers(): Promise<Array<User>> {
+  try {
+    const users = await db.select().from(user);
+    // Reverse the array so that the newest entries (last inserted) come first.
+    return users.reverse();
+  } catch (error) {
+    console.error('Failed to get users from database', error);
+    throw error;
+  }
+}
+
+export async function getUserById(id: string): Promise<Array<User>> {
+  try {
+    return await db.select().from(user).where(eq(user.id, id));
+  } catch (error) {
+    console.error('Failed to get user by id from database', error);
+    throw error;
+  }
+}
+
+export async function getUserActivity(userId: string) {
+  try {
+    return await db
+      .select()
+      .from(chat)
+      .where(eq(chat.userId, userId))
+      .orderBy(desc(chat.createdAt));
+  } catch (error) {
+    console.error('Failed to get user activity for user:', error);
     throw error;
   }
 }
