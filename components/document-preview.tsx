@@ -1,3 +1,4 @@
+// components/document-preview.tsx
 'use client';
 
 import {
@@ -40,21 +41,24 @@ export function DocumentPreview({
   >(result ? `/api/document?id=${result.id}` : null, fetcher);
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
-  const hitboxRef = useRef<HTMLDivElement>(null);
+  const hitboxRef = useRef<HTMLDivElement>(null); // Correct - initialized to null
 
   useEffect(() => {
-    const boundingBox = hitboxRef.current?.getBoundingClientRect();
+    // Correctly handle the possibility of hitboxRef.current being null
+    if (hitboxRef.current) {
+      const boundingBox = hitboxRef.current.getBoundingClientRect();
 
-    if (artifact.documentId && boundingBox) {
-      setArtifact((artifact) => ({
-        ...artifact,
-        boundingBox: {
-          left: boundingBox.x,
-          top: boundingBox.y,
-          width: boundingBox.width,
-          height: boundingBox.height,
-        },
-      }));
+      if (artifact.documentId && boundingBox) {
+        setArtifact((artifact) => ({
+          ...artifact,
+          boundingBox: {
+            left: boundingBox.x,
+            top: boundingBox.y,
+            width: boundingBox.width,
+            height: boundingBox.height,
+          },
+        }));
+      }
     }
   }, [artifact.documentId, setArtifact]);
 
@@ -102,7 +106,7 @@ export function DocumentPreview({
   return (
     <div className="relative w-full cursor-pointer">
       <HitboxLayer
-        hitboxRef={hitboxRef}
+        hitboxRef={hitboxRef} // No type assertion needed!
         result={result}
         setArtifact={setArtifact}
       />
@@ -146,7 +150,7 @@ const PureHitboxLayer = ({
   result,
   setArtifact,
 }: {
-  hitboxRef: React.RefObject<HTMLDivElement>;
+  hitboxRef: React.RefObject<HTMLDivElement | null>; // CORRECT: Allow null
   result: any;
   setArtifact: (
     updaterFn: UIArtifact | ((currentArtifact: UIArtifact) => UIArtifact),
@@ -154,6 +158,8 @@ const PureHitboxLayer = ({
 }) => {
   const handleClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
+        // Now need to check if the ref is available.
+        if (!hitboxRef.current) return;
       const boundingBox = event.currentTarget.getBoundingClientRect();
 
       setArtifact((artifact) =>
@@ -174,13 +180,13 @@ const PureHitboxLayer = ({
             },
       );
     },
-    [setArtifact, result],
+    [setArtifact, result, hitboxRef], // Add hitboxRef to the dependency array
   );
 
   return (
     <div
       className="size-full absolute top-0 left-0 rounded-xl z-10"
-      ref={hitboxRef}
+      ref={hitboxRef} // Pass the ref (which can be null)
       onClick={handleClick}
       role="presentation"
       aria-hidden="true"

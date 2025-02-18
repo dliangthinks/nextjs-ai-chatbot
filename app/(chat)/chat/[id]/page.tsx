@@ -29,9 +29,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     }
   }
 
-  const messagesFromDb = await getMessagesByChatId({
-    id,
-  });
+  const messagesFromDb = await getMessagesByChatId(id);
 
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get('chat-model');

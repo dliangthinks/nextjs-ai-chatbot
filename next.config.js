@@ -1,8 +1,7 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+// next.config.js
+const nextConfig = {
   experimental: {
-    ppr: true,
+    // ppr: true,
   },
   images: {
     remotePatterns: [
@@ -13,4 +12,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
