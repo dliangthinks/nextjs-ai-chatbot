@@ -1,0 +1,8 @@
+---
+description: debugging
+globs: 
+---
+
+# Project context
+
+- The current project uses Next.js 15 react 19 and react_dom 19. This version is significantly different from previous ones. When you write code, make sure you are using the right format.

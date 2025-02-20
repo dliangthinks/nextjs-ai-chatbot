@@ -12,9 +12,10 @@ const FileSchema = z.object({
       message: 'File size should be less than 5MB',
     })
     // Update the file type based on the kind of files you want to accept
-    .refine((file) => ['image/jpeg', 'image/png'].includes(file.type), {
-      message: 'File type should be JPEG or PNG',
-    }),
+    .refine((file) => 
+      ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type), 
+      'Only images (JPEG/PNG) and PDFs allowed'
+    ),
 });
 
 export async function POST(request: Request) {
@@ -51,11 +52,30 @@ export async function POST(request: Request) {
     const fileBuffer = await file.arrayBuffer();
 
     try {
-      const data = await put(`${filename}`, fileBuffer, {
+      const blob = await put(`${filename}`, fileBuffer, {
         access: 'public',
+        contentType: file.type,
       });
 
-      return NextResponse.json(data);
+      // For PDFs, return additional metadata to trigger artifact mode
+      if (file.type === 'application/pdf') {
+        return NextResponse.json({
+          url: blob.url,
+          pathname: filename,
+          contentType: file.type,
+          type: 'pdf',
+          artifactType: 'pdf', // Signal to trigger artifact mode
+          content: Buffer.from(fileBuffer).toString('base64') // PDF content
+        });
+      }
+
+      // For other files, return standard response
+      return NextResponse.json({
+        url: blob.url,
+        pathname: filename,
+        contentType: file.type
+      });
+
     } catch (error) {
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }

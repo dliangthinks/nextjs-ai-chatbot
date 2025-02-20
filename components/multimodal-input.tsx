@@ -20,6 +20,7 @@ import {
 } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useArtifact } from '@/hooks/use-artifact';
 
 import { sanitizeUIMessages } from '@/lib/utils';
 
@@ -67,6 +68,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const { setArtifact } = useArtifact();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -152,16 +154,38 @@ function PureMultimodalInput({
 
       if (response.ok) {
         const data = await response.json();
-        const { url, pathname, contentType } = data;
+        
+        // If it's a PDF, also trigger the artifact viewer
+        if (data.type === 'pdf') {
+          setArtifact({
+            kind: 'pdf',
+            title: data.pathname,
+            content: data.url,
+            isVisible: true,
+            status: 'idle',
+            documentId: 'init',
+            boundingBox: {
+              top: 0,
+              left: 0,
+              width: 100,
+              height: 100
+            }
+          });
+        }
 
         return {
-          url,
-          name: pathname,
-          contentType: contentType,
+          url: data.url,
+          name: data.pathname,
+          contentType: data.contentType,
+          type: data.type
         };
       }
-      const { error } = await response.json();
-      toast.error(error);
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        toast.error(error || 'Failed to upload file');
+        return;
+      }
     } catch (error) {
       toast.error('Failed to upload file, please try again!');
     }
@@ -170,27 +194,45 @@ function PureMultimodalInput({
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
+      const maxSize = 5 * 1024 * 1024; // 5MB
 
-      setUploadQueue(files.map((file) => file.name));
+      // Validate files before upload
+      const validFiles = files.filter(file => {
+        if (file.size > maxSize) {
+          toast.error(`${file.name} is too large. Maximum size is 5MB`);
+          return false;
+        }
+        if (!['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)) {
+          toast.error(`${file.name} is not a supported file type`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length === 0) return;
+
+      setUploadQueue(validFiles.map((file) => file.name));
 
       try {
-        const uploadPromises = files.map((file) => uploadFile(file));
+        const uploadPromises = validFiles.map((file) => uploadFile(file));
         const uploadedAttachments = await Promise.all(uploadPromises);
-        const successfullyUploadedAttachments = uploadedAttachments.filter(
-          (attachment) => attachment !== undefined,
+        const successfulAttachments = uploadedAttachments.filter(
+          (attachment): attachment is NonNullable<typeof attachment> => 
+            attachment !== undefined
         );
 
-        setAttachments((currentAttachments) => [
-          ...currentAttachments,
-          ...successfullyUploadedAttachments,
-        ]);
+        setAttachments((current) => [...current, ...successfulAttachments]);
       } catch (error) {
-        console.error('Error uploading files!', error);
+        console.error('Error uploading files:', error);
+        toast.error('Failed to upload one or more files');
       } finally {
         setUploadQueue([]);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     },
-    [setAttachments],
+    [setAttachments, setArtifact]
   );
 
   return (

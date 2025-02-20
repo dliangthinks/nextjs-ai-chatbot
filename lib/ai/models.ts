@@ -17,16 +17,13 @@ export const myProvider = customProvider({
     'chat-model-flash': google('gemini-2.0-flash-exp'),
     'chat-model-large': anthropic('claude-3-5-sonnet-latest'),
     'chat-model-reasoning': openai('o1-mini'),
-    'chat-model-deepseek': deepseek('deepseek-reasoner'),
-    //'chat-model-reasoning': wrapLanguageModel({
-    //  model: fireworks('accounts/fireworks/models/deepseek-r1'),
-    //  middleware: extractReasoningMiddleware({ tagName: 'think' }),
-    //}),
+    //'chat-model-deepseek': deepseek('deepseek-reasoner'),
+   
     'title-model': openai('gpt-4o-mini'),
     'artifact-model': openai('gpt-4o-mini'),
   },
   imageModels: {
-    'small-model': openai.image('dall-e-3'),
+    'small-model': openai.image('dall-e-2'),
     'large-model': openai.image('dall-e-3'),
   },
 });
@@ -58,9 +55,9 @@ export const chatModels: Array<ChatModel> = [
     name: 'GPT o1-mini',
     description: 'When advanced reasoning is needed...',
   },
-  {
+/*   {
     id: 'chat-model-deepseek',
     name: "DeepSeek R1",
     description: "Experience Chinese reasonining..."
-  }
+  } */
 ];
