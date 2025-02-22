@@ -1,5 +1,6 @@
 import { LoaderIcon } from './icons';
 import cn from 'classnames';
+import { useState } from 'react';
 
 interface ImageEditorProps {
   title: string;
@@ -16,6 +17,8 @@ export function ImageEditor({
   status,
   isInline,
 }: ImageEditorProps) {
+  const [error, setError] = useState<string | null>(null);
+
   return (
     <div
       className={cn('flex flex-row items-center justify-center w-full', {
@@ -24,22 +27,23 @@ export function ImageEditor({
       })}
     >
       {status === 'streaming' ? (
-        <div className="flex flex-row gap-4 items-center">
-          {!isInline && (
-            <div className="animate-spin">
-              <LoaderIcon />
-            </div>
-          )}
-          <div>Generating Image...</div>
+        <div className="flex flex-col items-center gap-2">
+          <div className="animate-spin">
+            <LoaderIcon />
+          </div>
+          <div>Generating Image with DALL-E...</div>
         </div>
+      ) : error ? (
+        <div className="text-destructive">{error}</div>
       ) : (
-        <picture>
+        <picture className="flex items-center justify-center">
           <img
-            className={cn('w-full h-fit max-w-[800px]', {
+            className={cn('object-contain max-w-[1024px] max-h-[1024px]', {
               'p-0 md:p-20': !isInline,
             })}
             src={`data:image/png;base64,${content}`}
             alt={title}
+            onError={() => setError('Failed to load image')}
           />
         </picture>
       )}

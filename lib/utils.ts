@@ -143,10 +143,11 @@ export function sanitizeResponseMessages({
 }) {
   const toolResultIds: Array<string> = [];
 
+  // First pass: collect non-empty tool results
   for (const message of messages) {
     if (message.role === 'tool') {
       for (const content of message.content) {
-        if (content.type === 'tool-result') {
+        if (content.type === 'tool-result' && typeof content.result === 'string' && content.result.trim() !== '') {
           toolResultIds.push(content.toolCallId);
         }
       }

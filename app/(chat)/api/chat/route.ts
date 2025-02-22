@@ -25,6 +25,7 @@ import { createDocument } from '@/lib/ai/tools/create-document';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
+import { detectImageRequest } from '@/lib/ai/tools/detect-image-request';
 
 export const maxDuration = 60;
 
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
                 'createDocument',
                 'updateDocument',
                 'requestSuggestions',
+                'detectImageRequest',
               ],
         experimental_transform: smoothStream({ chunking: 'word' }),
         experimental_generateMessageId: generateUUID,
@@ -82,6 +84,10 @@ export async function POST(request: Request) {
           createDocument: createDocument({ session, dataStream }),
           updateDocument: updateDocument({ session, dataStream }),
           requestSuggestions: requestSuggestions({
+            session,
+            dataStream,
+          }),
+          detectImageRequest: detectImageRequest({
             session,
             dataStream,
           }),
@@ -121,7 +127,7 @@ export async function POST(request: Request) {
       });
     },
     onError: () => {
-      return 'Oops, an error occured!';
+      return 'Oops, an error occurred!';
     },
   });
 }

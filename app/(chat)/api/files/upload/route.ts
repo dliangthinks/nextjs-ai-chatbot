@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         contentType: file.type,
       });
 
-      // For PDFs, return additional metadata to trigger artifact mode
+      // For PDFs and Images, return metadata to trigger artifact mode
       if (file.type === 'application/pdf') {
         return NextResponse.json({
           url: blob.url,
@@ -66,6 +66,15 @@ export async function POST(request: Request) {
           type: 'pdf',
           artifactType: 'pdf', // Signal to trigger artifact mode
           content: Buffer.from(fileBuffer).toString('base64') // PDF content
+        });
+      } else if (file.type.startsWith('image/')) {
+        return NextResponse.json({
+          url: blob.url,
+          pathname: filename,
+          contentType: file.type,
+          type: 'image',
+          artifactType: 'image', // Signal to trigger artifact mode
+          content: Buffer.from(fileBuffer).toString('base64') // Image content
         });
       }
 

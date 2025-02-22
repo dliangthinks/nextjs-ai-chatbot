@@ -24,7 +24,7 @@ export const myProvider = customProvider({
   },
   imageModels: {
     'small-model': openai.image('dall-e-2'),
-    'large-model': openai.image('dall-e-3'),
+    'dalle': openai.image('dall-e-3'),
   },
 });
 

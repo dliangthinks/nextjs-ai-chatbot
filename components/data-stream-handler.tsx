@@ -17,8 +17,10 @@ export type DataStreamDelta = {
     | 'suggestion'
     | 'clear'
     | 'finish'
-    | 'kind';
-  content: string | Suggestion;
+    | 'kind'
+    | 'visibility'
+    | 'status';
+  content: string | Suggestion | boolean;
 };
 
 export function DataStreamHandler({ id }: { id: string }) {
@@ -26,70 +28,93 @@ export function DataStreamHandler({ id }: { id: string }) {
   const { artifact, setArtifact, setMetadata } = useArtifact();
   const lastProcessedIndex = useRef(-1);
 
+  // Reset artifact state when component mounts or id changes
+  useEffect(() => {
+    setArtifact(initialArtifactData);
+    lastProcessedIndex.current = -1;
+  }, [id, setArtifact]);
+
   useEffect(() => {
     if (!dataStream?.length) return;
 
     const newDeltas = dataStream.slice(lastProcessedIndex.current + 1);
     lastProcessedIndex.current = dataStream.length - 1;
 
-    (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
-      const artifactDefinition = artifactDefinitions.find(
-        (artifactDefinition) => artifactDefinition.kind === artifact.kind,
-      );
+    try {
+      (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
+        const artifactDefinition = artifactDefinitions.find(
+          (artifactDefinition) => artifactDefinition.kind === artifact.kind,
+        );
 
-      if (artifactDefinition?.onStreamPart) {
-        artifactDefinition.onStreamPart({
-          streamPart: delta,
-          setArtifact,
-          setMetadata,
+        if (artifactDefinition?.onStreamPart) {
+          artifactDefinition.onStreamPart({
+            streamPart: delta,
+            setArtifact,
+            setMetadata,
+          });
+        }
+
+        setArtifact((draftArtifact) => {
+          if (!draftArtifact) {
+            return { ...initialArtifactData, status: 'streaming' };
+          }
+
+          switch (delta.type) {
+            case 'clear':
+              return {
+                ...initialArtifactData,
+                status: 'streaming',
+              };
+
+            case 'id':
+              return {
+                ...draftArtifact,
+                documentId: delta.content as string,
+                status: 'streaming',
+              };
+
+            case 'title':
+              return {
+                ...draftArtifact,
+                title: delta.content as string,
+                status: 'streaming',
+              };
+
+            case 'kind':
+              return {
+                ...draftArtifact,
+                kind: delta.content as ArtifactKind,
+                status: 'streaming',
+              };
+
+            case 'visibility':
+              return {
+                ...draftArtifact,
+                isVisible: delta.content as boolean,
+              };
+
+            case 'status':
+              return {
+                ...draftArtifact,
+                status: delta.content as 'streaming' | 'idle',
+              };
+
+            case 'finish':
+              return {
+                ...draftArtifact,
+                status: 'idle',
+              };
+
+            default:
+              return draftArtifact;
+          }
         });
-      }
-
-      setArtifact((draftArtifact) => {
-        if (!draftArtifact) {
-          return { ...initialArtifactData, status: 'streaming' };
-        }
-
-        switch (delta.type) {
-          case 'id':
-            return {
-              ...draftArtifact,
-              documentId: delta.content as string,
-              status: 'streaming',
-            };
-
-          case 'title':
-            return {
-              ...draftArtifact,
-              title: delta.content as string,
-              status: 'streaming',
-            };
-
-          case 'kind':
-            return {
-              ...draftArtifact,
-              kind: delta.content as ArtifactKind,
-              status: 'streaming',
-            };
-
-          case 'clear':
-            return {
-              ...draftArtifact,
-              content: '',
-              status: 'streaming',
-            };
-
-          case 'finish':
-            return {
-              ...draftArtifact,
-              status: 'idle',
-            };
-
-          default:
-            return draftArtifact;
-        }
       });
-    });
+    } catch (error) {
+      console.error('[DataStreamHandler] Error processing stream:', error);
+      // Reset to initial state on error
+      setArtifact(initialArtifactData);
+    }
   }, [dataStream, setArtifact, setMetadata, artifact]);
 
   return null;

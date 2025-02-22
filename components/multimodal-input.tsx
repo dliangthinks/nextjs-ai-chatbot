@@ -155,7 +155,7 @@ function PureMultimodalInput({
       if (response.ok) {
         const data = await response.json();
         
-        // If it's a PDF, also trigger the artifact viewer
+        // Handle both PDF and image artifacts
         if (data.type === 'pdf') {
           setArtifact({
             kind: 'pdf',
@@ -169,6 +169,21 @@ function PureMultimodalInput({
               left: 0,
               width: 100,
               height: 100
+            }
+          });
+        } else if (data.type === 'image') {
+          setArtifact({
+            kind: 'image',
+            title: data.pathname,
+            content: data.content,
+            isVisible: true,
+            status: 'idle',
+            documentId: 'init',
+            boundingBox: {
+              top: 0,
+              left: 0,
+              width: 1024,  // Max width matches ImageEditor's max-w-[1024px]
+              height: 1024  // Height can be same as width, image will scale proportionally
             }
           });
         }
