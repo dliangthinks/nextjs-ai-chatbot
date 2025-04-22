@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tt-aiplayground.vercel.app'),
+  metadataBase: new URL('https://www.dliangthinks.me'),
   title: 'Stanford Technology Training AI Playground',
   description: 'Next.js React Tailwind CSS',
 };

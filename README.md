@@ -1,6 +1,6 @@
 
-<a href="https://www.dlianthinks.me/">
-  <img alt="AI is the future" src="app/(chat)/ai.png">
+<a href="https://www.dliangthinks.me/">
+  <img alt="AI is the future" src="app/(chat)/AI.jpg">
   <h1 align="center">AI Playground</h1>
 </a>
 
