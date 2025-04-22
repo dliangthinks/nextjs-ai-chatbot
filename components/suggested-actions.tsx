@@ -16,9 +16,9 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'Simple Math',
-      label: 'Which number is bigger 9.11 and 9.9?',
-      action: 'which is bigger 9.11 and 9.9?',
+      title: 'Weather in Cupertino',
+      label: 'What is the weather in Cupertino?',
+      action: 'What is the weather in Cupertino?',
     },
     {
       title: 'Counting',

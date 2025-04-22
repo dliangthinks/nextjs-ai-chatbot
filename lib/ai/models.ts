@@ -15,7 +15,7 @@ export const myProvider = customProvider({
   languageModels: {
     'chat-model-small': openai('gpt-4o-mini'),
     'chat-model-flash': google('gemini-2.0-flash-exp'),
-    'chat-model-large': anthropic('claude-3-5-sonnet-latest'),
+    'chat-model-large': anthropic('claude-3-7-sonnet-20250219'),
     'chat-model-reasoning': openai('o1-mini'),
     //'chat-model-deepseek': deepseek('deepseek-reasoner'),
    
@@ -47,7 +47,7 @@ export const chatModels: Array<ChatModel> = [
   },
   {
     id: 'chat-model-large',
-    name: 'Claude Sonnet 3.5',
+    name: 'Claude Sonnet 3.7',
     description: 'Excellent model for writing stuff',
   },
   {
